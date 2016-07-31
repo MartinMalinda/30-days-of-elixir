@@ -8,12 +8,6 @@ defmodule MyTest do
 
   test 'simple test' do
     assert 1 + 1 == 2
-    #assert 1 + 1 == 3                      # Elixir is smart! No need for assert_equal, assert_gte, etc.
-                                            # And we still get great failure messages, yipee!
-                                            # 1) test_assert (MyTest)
-                                            #    ** (ExUnit.ExpectationError)
-                                            #                 expected: 2
-                                            #      to be equal to (==): 3
   end
 
   test "refute is opposite of assert" do    # test macro accepts string as test name
@@ -24,6 +18,16 @@ defmodule MyTest do
     assert_raise ArithmeticError, fn ->
       1 + "x"
     end
+  end
+
+  test 'deleting list items' do
+    a = [1, 2, 3, 4]
+      |> List.delete(1)
+      |> List.delete_at(0)
+
+    assert length(a) == 2
+    assert a == [3, 4]
+
   end
 
   test "assert_in_delta asserts that val1 and val2 differ by less than delta." do

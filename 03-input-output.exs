@@ -1,60 +1,58 @@
-# http://elixir-lang.org/docs/stable/elixir/IO.html
-# http://elixir-lang.org/docs/stable/elixir/File.html
+# TODO: add proper {:error} returns
 
-defmodule CowInterrogator do
-
-  # docstring are quite useful you can generate docs out of them
-  # check: http://elixir-lang.org/getting-started/module-attributes.html
-  # for more info
-  @doc """
-  Gets name from standard IO
-  """
-  def get_name do
-    IO.gets("What is your name? ")
-    |> String.strip
+defmodule Forecast do
+  def temperature_for_day(day) when day > -1 and day < 120 do
+    day / 365 * 25
   end
 
-  def get_cow_lover do
-    IO.getn("Do you like cows? [y|n] ", 1)
+  def temperature_for_day(day) when day > 119 and day < 365 do
+    (365 - day) / 365 * 25
   end
 
-  def interrogate do
-    name = get_name
-    case String.downcase(get_cow_lover) do
-      "y" ->
-        IO.puts "Great! Here's a cow for you #{name}:"
-        IO.puts cow_art
-      "n" ->
-        IO.puts "That's a shame, #{name}."
-      _ ->
-        IO.puts "You should have entered 'y' or 'n'."
+  def temperature_for_day(_), do: IO.puts "invalid input"
+
+  def check_input(input) do
+    try do
+      String.to_integer(input)
+    rescue
+       e in ArgumentError -> "invalid input"
+       "invalid input"
     end
   end
 
-  def cow_art do
-    path = Path.expand("support/cow.txt", __DIR__)
-    case File.read(path) do
-      {:ok, art} -> art
-      {:error, _} -> IO.puts "Error: cow.txt file not found"; System.halt(1)
-    end
+  def get_forecast(input) do
+    input
+      |> String.replace("\n", "")
+      |> check_input
+      |> temperature_for_day
+      |> IO.puts
+  end
+
+  def init do
+    day = IO.gets "Enter a day(0 - 364) to get a forecast: "
+
+    get_forecast day
+
   end
 end
 
 ExUnit.start
 
-
-defmodule InputOutputTest do
+defmodule ForecastTest do
   use ExUnit.Case
-  import String
 
-  test "checks if cow_art returns string from support/cow.txt" do
-    # this call checks if cow_art function returns art from txt file
-    art = CowInterrogator.cow_art
-    assert strip(art) |> first == "(" # first is implemented in String module
+  test "bad input is caught" do
+    assert Forecast.get_forecast("000043424s") == "invalid input"
+  end
+
+  test "temp is calculated correctly" do
+    assert Forecast.get_forecast(0) == 0
+    assert Forecast.get_forecast(364) == 1/365 * 25
+  end
+
+  test "bad day number is caught" do
+    assert Forecast.get_forecast("400") == "invalid input"
   end
 end
 
-# call interrogate performs most of the work
-# asks about your name, your interests in cows
-# and renders cow art
-CowInterrogator.interrogate
+Forecast.init
