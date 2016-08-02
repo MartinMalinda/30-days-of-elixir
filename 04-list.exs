@@ -13,6 +13,37 @@ defmodule ListTest do
     assert sample == ~w(Tim Jen Mac Kai)
   end
 
+  test "length" do
+    assert length(sample) == 4
+  end
+
+  test "map" do
+    assert Enum.map(sample, &(String.length(&1))) == [3, 3, 3, 3]
+  end
+
+  test "reduce" do
+    sum = Enum.reduce sample, 0, &(String.length(&1) + &2)
+    assert sum == 3 * 4
+  end
+
+  test "filter" do
+    names_with_a_length = Enum.filter sample, &(String.contains?(&1, "a"))
+
+    assert length(names_with_a_length) == 2
+    [head | _] = names_with_a_length
+    assert head == "Mac"
+  end
+
+  test "pipe" do
+    result = sample ++ ["Jack", "Rob"]
+    |> Enum.map(&(&1 <> "test"))
+    |> Enum.take_random(1)
+    |> List.first
+    |> String.contains?("test")
+
+    assert result;
+  end
+
   test "head" do
     [head | _] = sample
     assert head == "Tim"
