@@ -43,6 +43,7 @@ defmodule MapTest do
   test "Map.put" do
     assert Map.put(sample, :foo, 'bob') == %{foo: 'bob', baz: 'quz'}
     assert Map.put(sample, :far, 'bar') == %{foo: 'bar', baz: 'quz', far: 'bar'}
+    assert %{sample | foo: 'rob'} == %{foo: 'rob', baz: 'quz'}
   end
 
   test "pattern matching" do
