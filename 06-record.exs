@@ -1,7 +1,7 @@
 ExUnit.start
 
 defmodule User do
-  defstruct email: nil, password: nil
+  defstruct email: nil, password: nil, parent: nil
 end
 
 defimpl String.Chars, for: User do
@@ -16,7 +16,7 @@ defmodule RecordTest do
   defmodule ScopeTest do
     use ExUnit.Case
 
-    require Record
+    require Record # records are tuples with the atom as first element, they are used to work with short internal data
     Record.defrecordp :person, first_name: nil, last_name: nil, age: nil
 
     test "defrecordp" do
@@ -35,7 +35,7 @@ defmodule RecordTest do
   end
 
   test "defstruct" do
-    assert sample == %{__struct__: User, email: "kai@example.com", password: "trains"}
+    assert sample == %{__struct__: User, email: "kai@example.com", password: "trains", parent: nil}
   end
 
   test "property" do
@@ -46,6 +46,17 @@ defmodule RecordTest do
     u = sample
     u2 = %User{u | email: "tim@example.com"}
     assert u2 == %User{email: "tim@example.com", password: "trains"}
+  end
+
+  test "nested records" do
+    father = %User{email: "a@gmail.com", password: "turtles"}
+    son = %User{email: "b@gmail.com", password: "turtles", parent: father}
+
+    grandson = %User{ son | parent: son}
+
+    assert son.parent == father
+    assert father.parent == nil
+    assert grandson.parent.parent == father
   end
 
   test "protocol" do
